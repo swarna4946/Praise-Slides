@@ -13,9 +13,7 @@ function Presentation({ songs }) {
   const slides = song?.lyrics
     ?.split("\n\n")
     .filter((slide) => slide.trim() !== "") || [];
-
-  const [currentSlide, setCurrentSlide] =
-    useState(0);
+    const [currentSlide, setCurrentSlide] = useState(0);
 
  useEffect(() => {
 
