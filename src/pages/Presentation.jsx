@@ -17,18 +17,6 @@ function Presentation({ songs }) {
   const [currentSlide, setCurrentSlide] =
     useState(0);
 
-  const goNext = () => {
-    if (currentSlide < slides.length - 1) {
-      setCurrentSlide((prev) => prev + 1);
-    }
-  };
-
-  const goPrevious = () => {
-    if (currentSlide > 0) {
-      setCurrentSlide((prev) => prev - 1);
-    }
-  };
-
  useEffect(() => {
 
   const handleKeyDown = (e) => {
