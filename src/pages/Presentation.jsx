@@ -7,12 +7,12 @@ function Presentation({ songs }) {
   const presentationRef = useRef();
 
   const song = songs.find(
-    (song) => song.id === parseInt(id)
+    (song) => song.id === id
   );
 
-  const slides = song?.lyrics
-    ?.split("\n\n")
-    .filter((slide) => slide.trim() !== "") || [];
+ const slides = song?.lyrics
+  ?.split("\n\n")
+  .filter((slide) => slide.trim() !== "") || [];
     const [currentSlide, setCurrentSlide] = useState(0);
 
  useEffect(() => {
@@ -38,9 +38,10 @@ function Presentation({ songs }) {
     if (
       e.key.toLowerCase() === "f" &&
       presentationRef.current
-    ) {
-      presentationRef.current.requestFullscreen();
-    }
+    ) 
+    if (!document.fullscreenElement) {
+    presentationRef.current.requestFullscreen();
+}
 
   };
 
@@ -100,14 +101,16 @@ function Presentation({ songs }) {
         ⛶ Full Screen
       </button>
 
-      <h1
-        style={{
-          color: "#D4AF37",
-          marginBottom: "30px"
-        }}
-      >
-        {song.title}
-      </h1>
+      {currentSlide === 0 && (
+  <h1
+    style={{
+      color: "#D4AF37",
+      marginBottom: "30px"
+    }}
+  >
+    {song.title}
+  </h1>
+)}
 
       <pre
         style={{

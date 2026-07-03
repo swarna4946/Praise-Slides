@@ -8,9 +8,12 @@ function Favorites({ favorites }) {
       <p>Total Favorites: {favorites.length}</p>
 
       {favorites.length === 0 ? (
-        <div style={{textAlign:"center", marginTop:"80px"}}>
-        <h2>No favorite songs yet ❤️</h2>
-        <p>Add songs from the Songs page.</p></div>
+        <div className="empty-favorites">
+  <h2>💛 No Favorite Songs Yet</h2>
+  <p>
+    Tap the ⭐ button on any song to add it here.
+  </p>
+</div>
       ) : (
         favorites.map((song) => (
           <div

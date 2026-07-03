@@ -1,12 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-function EditSong({ songs, setSongs }) {
+function EditSong({ songs, setSongs,getSongs,updateSongInDB }) {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const song = songs.find(
-    (song) => song.id === parseInt(id)
+    (song) => String(song.id) === id
   );
 
   const [title, setTitle] = useState(song.title);
@@ -14,75 +14,96 @@ function EditSong({ songs, setSongs }) {
   const [category, setCategory] = useState(song.category);
   const [lyrics, setLyrics] = useState(song.lyrics);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const updatedSongs = songs.map((s) =>
-      s.id === song.id
-        ? {
-            ...s,
-            title,
-            language,
-            category,
-            lyrics,
-          }
-        : s
-    );
+ await updateSongInDB(song.id, {
+  title,
+  language,
+  category,
+  lyrics,
+});
 
-    setSongs(updatedSongs);
+const data = await getSongs();
 
-    navigate("/songs");
+setSongs(data);
+
+
+
+navigate("/songs");
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Edit Song</h1>
+  <div className="add-song-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          value={title}
-          onChange={(e) =>
-            setTitle(e.target.value)
-          }
-        />
+    <h1>✏️ Edit Song</h1>
 
-        <br /><br />
+    <p className="add-song-subtitle">
+      Update your worship song details.
+    </p>
 
-        <input
-          value={language}
-          onChange={(e) =>
-            setLanguage(e.target.value)
-          }
-        />
+    <form onSubmit={handleSubmit}>
 
-        <br /><br />
+      <label>Song Title</label>
 
-        <input
-          value={category}
-          onChange={(e) =>
-            setCategory(e.target.value)
-          }
-        />
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
 
-        <br /><br />
+      <div className="form-row">
 
-        <textarea
-          rows="8"
-          cols="50"
-          value={lyrics}
-          onChange={(e) =>
-            setLyrics(e.target.value)
-          }
-        />
+        <div>
+          <label>Language</label>
 
-        <br /><br />
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+          >
+            <option>Telugu</option>
+            <option>English</option>
+            <option>Tamil</option>
+            <option>Hindi</option>
+          </select>
+        </div>
 
-        <button type="submit">
-          Save Changes
-        </button>
-      </form>
-    </div>
-  );
+        <div>
+          <label>Category</label>
+
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option>Worship</option>
+            <option>Praise</option>
+            <option>Christmas</option>
+            <option>Communion</option>
+            <option>Offering</option>
+            <option>Youth</option>
+          </select>
+        </div>
+
+      </div>
+
+      <label>Song Lyrics</label>
+
+      <textarea
+        rows="12"
+        value={lyrics}
+        onChange={(e) => setLyrics(e.target.value)}
+      />
+
+      <button
+        className="add-song-btn"
+        type="submit"
+      >
+        💾 Save Changes
+      </button>
+
+    </form>
+
+  </div>
+);
 }
 
 export default EditSong;

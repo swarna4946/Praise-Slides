@@ -7,7 +7,7 @@ function Songdetails({songs}) {
   const { id } = useParams();
 
   const song = songs.find(
-    (song) => song.id === parseInt(id)
+    (song) => song.id === id
   );
 
   if (!song) {

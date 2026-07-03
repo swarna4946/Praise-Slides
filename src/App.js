@@ -1,3 +1,6 @@
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState,useEffect ,} from "react";
 
@@ -10,86 +13,105 @@ import Presentation from "./pages/Presentation";
 import AddSong from "./pages/AddSong";
 import Favorites from "./pages/Favorites";
 
-import songsData from "./data/songs";
 import EditSong from "./pages/EditSong";
+import { getSongs,addSongToDB,deleteSongFromDB ,
+  updateSongInDB,
+  getFavorites,
+  addFavoriteToDB,
+  removeFavoriteFromDB
+
+
+} from "./services/songService";
 
 function App() {
 
- 
-
-  const [songs, setSongs] = useState(() => {
-  const savedSongs = localStorage.getItem("songs");
-  
-
-  return savedSongs
-    ? JSON.parse(savedSongs)
-    : songsData;
+const [darkMode, setDarkMode] = useState(() => {
+  return localStorage.getItem("theme") === "dark";
 });
-
-  useEffect(() => {
+useEffect(() => {
   localStorage.setItem(
-    "songs",
-    JSON.stringify(songs)
+    "theme",
+    darkMode ? "dark" : "light"
   );
-}, [songs]);
-const [favorites, setFavorites] = useState(() => {
-  const savedFavorites =
-    localStorage.getItem("favorites");
 
-  return savedFavorites
-    ? JSON.parse(savedFavorites)
-    : [];
-});
-  useEffect(() => {
-  localStorage.setItem(
-    "favorites",
-    JSON.stringify(favorites)
-  );
-}, [favorites]);
+  document.body.className = darkMode
+    ? "dark-theme"
+    : "light-theme";
+}, [darkMode]);
 
-  const addSong = (newSong) => {
-    setSongs([
-      ...songs,
-      {
-        ...newSong,
-        id:Date.now()
-      }
-    ]);  
+const [songs, setSongs] = useState([]);
+
+const [favorites, setFavorites] = useState([]);
+const [loading, setLoading] = useState(true);
+useEffect(() => {
+  const loadSongs = async () => {
+    setLoading(true);
+    const data = await getSongs();
+
+    setSongs(data);
+
+    setLoading(false);
+  };
+
+  loadSongs();
+}, []);
+const addSong = async (newSong) => {
+  await addSongToDB(newSong);
+
+  const data = await getSongs();
+
+  setSongs(data);
+  toast.success("Song added successfully!");
 };
-  const deleteSong = (id) => {
 
-  setSongs(
-    songs.filter(
-      (song) => song.id !== id
-    )
-  );
+const deleteSong = async (id) => {
+  await deleteSongFromDB(id);
+
+  const data = await getSongs();
+
+  setSongs(data);
 
   setFavorites(
     favorites.filter(
       (fav) => fav.id !== id
     )
   );
+  toast.success("Song deleted!")
 };
- const addFavorite = (song) => {
+
+ const addFavorite = async (song) => {
   const exists = favorites.find(
-    (fav) => fav.id === song.id
+    (fav) => fav.songId === song.id
+    
   );
 
   if (exists) {
-    setFavorites(
-      favorites.filter(
-        (fav) => fav.id !== song.id
-      )
-    );
+    await removeFavoriteFromDB(song.id);
+    toast.info("Removed from Favourites")
   } else {
-    setFavorites([
-      ...favorites,
-      song
-    ]);
+    await addFavoriteToDB({
+      songId: song.id,
+      title: song.title,
+      language: song.language,
+      category: song.category,
+    });
+    toast.success("Added to Favorites❤️")
   }
+
+  const data = await getFavorites();
+  setFavorites(data);
 };
+
 const exportSongs = () => {
-  const data = JSON.stringify(songs, null, 2);
+  const exportData = songs.map(
+    ({ id, ...song }) => song
+  );
+
+  const data = JSON.stringify(
+    exportData,
+    null,
+    2
+  );
 
   const blob = new Blob([data], {
     type: "application/json",
@@ -99,43 +121,96 @@ const exportSongs = () => {
 
   const link = document.createElement("a");
 
+  const today = new Date().toISOString().split("T")[0];
+
   link.href = url;
-  link.download = "Christian_Worship_Hub_Songs.json";
+  link.download = `Praise_Slides_${today}.json`;
 
   link.click();
 
   URL.revokeObjectURL(url);
+
+  toast.success("Songs exported successfully! 📤");
+};
+const importSongs = (event) => {
+  const file = event.target.files[0];
+
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = async (e) => {
+  try {
+    const importedSongs = JSON.parse(e.target.result);
+
+    // Current songs from Firebase
+    const existingSongs = await getSongs();
+
+    let importedCount = 0;
+    let skippedCount = 0;
+
+    for (const song of importedSongs) {
+      const exists = existingSongs.some(
+        (s) =>
+          s.title.trim().toLowerCase() ===
+            song.title.trim().toLowerCase() &&
+          s.language === song.language
+      );
+
+      if (!exists) {
+        await addSongToDB({
+          title: song.title,
+          language: song.language,
+          category: song.category,
+          lyrics: song.lyrics,
+        });
+
+        importedCount++;
+      } else {
+        skippedCount++;
+      }
+    }
+
+    const data = await getSongs();
+    setSongs(data);
+
+    toast.success(
+      `${importedCount} song(s) imported 🎉`
+    );
+
+    if (skippedCount > 0) {
+      toast.info(
+        `${skippedCount} duplicate song(s) skipped`
+      );
+    }
+
+  } catch (error) {
+    toast.error("Invalid JSON file!");
+  }
 };
 
-const importSongs=(event)=>{
-  const file =event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload=(e)=>{
-    try{
-      const importedSongs=JSON.parse(
-        e.target.result
-      );
-      setSongs(importedSongs);
-      alert("Songs imported successfully!");
-    } catch{
-      alert("Invalid JSON file.");
-    }
-    };
-    reader.readAsText(file);
-  } ;
-  <input
-  type="file"
-  accept=".json"
-  onChange={importSongs}
-/>
+  reader.readAsText(file);
+};
+
+if (loading) {
+  return (
+    <div className="loading">
+      <div className="spinner"></div>
+      <h2>Loading Praise Slides...</h2>
+    </div>
+  );
+}
 
 
   return (
     <div >
     <BrowserRouter>
 
-      <Navbar exportSongs={exportSongs} />
+      <Navbar exportSongs={exportSongs}
+      importSongs={importSongs}
+      darkMode={darkMode}
+      setDarkMode={setDarkMode}
+      />
 
       <Routes>
         <Route
@@ -167,12 +242,22 @@ const importSongs=(event)=>{
         <Route path="/favorites" element={<Favorites favorites={favorites} />}
         />
 
-        <Route path="/edit/:id" element={<EditSong songs={songs} setSongs={setSongs} />} 
-        /> 
+         <Route path="/edit/:id" element={
+            <EditSong songs={songs}
+                      setSongs={setSongs}
+                      getSongs={getSongs}
+                      updateSongInDB={updateSongInDB}
+    />
+  }
+/>
       
       </Routes>
 
     </BrowserRouter>
+    <ToastContainer 
+    position="top-right"
+    autoClose={2000}
+    />
     </div>
   );
 }

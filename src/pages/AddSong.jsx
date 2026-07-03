@@ -37,15 +37,15 @@ function AddSong({ addSong }) {
       <h1>🎵Add New Song</h1>
 
       <form onSubmit={handleSubmit}>
-
+      <label>Song Title</label>
         <input
           
           type="text"
-          placeholder=" Enter Song Title"
+          placeholder=" e.g. Amazing Grace"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-
+        <div className="form-row">
         <select 
           value={language}
           onChange={(e) => setLanguage(e.target.value)}
@@ -103,13 +103,16 @@ function AddSong({ addSong }) {
             Youth
           </option>
         </select>
+        </div>
 
-        <textarea
-          rows="10"
-          placeholder="Type the Song Lyrics here..."
-          value={lyrics}
-          onChange={(e) => setLyrics(e.target.value)}
-        />
+        <label>Song Lyrics</label>
+
+<textarea
+  rows="10"
+  placeholder="Type the song lyrics here..."
+  value={lyrics}
+  onChange={(e) => setLyrics(e.target.value)}
+/>
 
         <button
           type="submit"

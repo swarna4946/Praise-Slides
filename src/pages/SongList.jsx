@@ -29,13 +29,8 @@ function Songlist({ songs ,deleteSong, addFavorite,favorites}) {
         type="text"
         placeholder="Search Song..."
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{
-          padding: "10px",
-          width: "300px",
-          marginBottom: "20px",
-        }}
-      />
+        onChange={(e) => setSearch(e.target.value)}/>
+        
       <select className='filter-select'
         value={languageFilter}
         onChange={(e) => setLanguageFilter(e.target.value)}
@@ -70,7 +65,7 @@ function Songlist({ songs ,deleteSong, addFavorite,favorites}) {
 
         <button className="favorite-btn" onClick={() => addFavorite(song)}>
   {favorites.some(
-    (fav) => fav.id === song.id
+    (fav) => fav.songId === song.id
   )
     ? "💔"
     : "⭐"}

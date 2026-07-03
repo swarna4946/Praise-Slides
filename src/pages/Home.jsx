@@ -80,6 +80,7 @@ function Home({ songs = [] }) {
   </p>
 
   <h4>Psalm 96:1</h4>
+  
 
   <p>© 2026 Praise Slides</p>
 </footer>
