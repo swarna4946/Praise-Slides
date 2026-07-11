@@ -1,0 +1,47 @@
+.presentation-container {
+  background: #000;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.presentation-title {
+  color: #D4AF37;
+  margin-bottom: 30px;
+}
+
+.presentation-lyrics {
+  white-space: pre-wrap;
+  font-size: 36px;
+  line-height: 1.6;
+  font-family: inherit;
+}
+
+.slide-counter {
+  margin-top: 30px;
+  color: #ccc;
+}
+
+.presentation-help {
+  opacity: 0.6;
+  font-size: 16px;
+}
+
+.fullscreen-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #D4AF37;
+  color: #1E3A5F;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+}

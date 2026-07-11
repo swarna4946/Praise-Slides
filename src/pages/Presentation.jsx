@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import "../styles/Presentation.css";
+import usePresentationControls from "../hooks/usePresentationControls";
+import { listenPresentation } from "../services/presentationService";
 
 function Presentation({ songs }) {
   const { id } = useParams();
@@ -14,50 +17,42 @@ function Presentation({ songs }) {
   ?.split("\n\n")
   .filter((slide) => slide.trim() !== "") || [];
     const [currentSlide, setCurrentSlide] = useState(0);
-
- useEffect(() => {
-
-  const handleKeyDown = (e) => {
-
-    if (e.key === "ArrowRight") {
-      setCurrentSlide((prev) =>
-        prev < slides.length - 1
-          ? prev + 1
-          : prev
-      );
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    usePresentationControls(
+  slides,
+  setCurrentSlide,
+  presentationRef
+);
+useEffect(() => {
+  const unsubscribe = listenPresentation((data) => {
+    if (data && data.song && data.song.id === song.id) {
+      setCurrentSlide(data.currentSlide);
     }
+  });
 
-    if (e.key === "ArrowLeft") {
-      setCurrentSlide((prev) =>
-        prev > 0
-          ? prev - 1
-          : prev
-      );
-    }
-
-    if (
-      e.key.toLowerCase() === "f" &&
-      presentationRef.current
-    ) 
-    if (!document.fullscreenElement) {
-    presentationRef.current.requestFullscreen();
-}
-
+  return () => unsubscribe();
+}, [song]);
+  
+    useEffect(() => {
+  const handleFullscreenChange = () => {
+    setIsFullscreen(!!document.fullscreenElement);
   };
+  
 
-  window.addEventListener(
-    "keydown",
-    handleKeyDown
+  document.addEventListener(
+    "fullscreenchange",
+    handleFullscreenChange
   );
 
   return () => {
-    window.removeEventListener(
-      "keydown",
-      handleKeyDown
+    document.removeEventListener(
+      "fullscreenchange",
+      handleFullscreenChange
     );
   };
+}, []);
 
-}, [slides.length]);
+ 
 
   if (!song) {
     return <h1>Song Not Found</h1>;
@@ -67,79 +62,46 @@ function Presentation({ songs }) {
     <div
       ref={presentationRef}
       className="presentation-container"
-      style={{
-        background: "#000",
-        color: "#fff",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        textAlign: "center",
-        padding: "20px"
-      }}
+      
     >
-      <button
-        className="fullscreen-btn"
-        onClick={() =>
-          presentationRef.current.requestFullscreen()
-        }
-        style={{
-          position: "fixed",
-          top: "20px",
-          right: "20px",
-          background: "#D4AF37",
-          color: "#1E3A5F",
-          border: "none",
-          padding: "12px 24px",
-          borderRadius: "12px",
-          fontWeight: "bold",
-          cursor: "pointer",
-          fontSize: "16px"
-        }}
-      >
-        ⛶ Full Screen
-      </button>
+      {!isFullscreen && (
+  <button
+    className="fullscreen-btn"
+    onClick={() =>
+      presentationRef.current.requestFullscreen()
+    }>
+    ⛶ Full Screen
+  </button>
+)}
 
       {currentSlide === 0 && (
   <h1
-    style={{
-      color: "#D4AF37",
-      marginBottom: "30px"
-    }}
-  >
+    className="presentation-title">
     {song.title}
   </h1>
 )}
 
       <pre
-        style={{
-          whiteSpace: "pre-wrap",
-          fontSize: "36px",
-          lineHeight: "1.6",
-          fontFamily: "inherit"
-        }}
+        className="presentation-lyrics"
       >
         {slides[currentSlide]}
       </pre>
 
-      <h3
-        style={{
-          marginTop: "30px",
-          color: "#ccc"
-        }}
-      >
-        Slide {currentSlide + 1} / {slides.length}
-      </h3>
+      {!isFullscreen && (
+  <h3
+    className="slide-counter"
+  >
+    Slide {currentSlide + 1} / {slides.length}
+  </h3>
+)}
 
-      <p
-        style={{
-          opacity: 0.6,
-          fontSize: "16px"
-        }}
-      >
-        ← → Navigate Slides | Press F for Full Screen
-      </p>
+      {!isFullscreen && (
+  <p
+    className="presentation-help"
+  >
+    ← → Navigate Slides | Press F for Full Screen
+  </p>
+)}
     </div>
   );
 }

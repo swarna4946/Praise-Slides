@@ -14,6 +14,8 @@ import AddSong from "./pages/AddSong";
 import Favorites from "./pages/Favorites";
 
 import EditSong from "./pages/EditSong";
+import Controller from "./pages/Controller";
+
 import { getSongs,addSongToDB,deleteSongFromDB ,
   updateSongInDB,
   getFavorites,
@@ -242,14 +244,20 @@ if (loading) {
         <Route path="/favorites" element={<Favorites favorites={favorites} />}
         />
 
+        <Route
+  path="/controller"
+  element={<Controller songs={songs} />}
+/>
+
          <Route path="/edit/:id" element={
             <EditSong songs={songs}
                       setSongs={setSongs}
                       getSongs={getSongs}
                       updateSongInDB={updateSongInDB}
-    />
-  }
-/>
+            />
+         } />
+
+        
       
       </Routes>
 

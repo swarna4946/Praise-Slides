@@ -94,13 +94,14 @@ nav a:hover{
   border-radius:18px;
   padding:25px;
   margin-bottom:20px;
+  border-left:5px solid #D4AF37;
   box-shadow:0 8px 20px rgba(0,0,0,.08);
   transition:all.3s ease;
 }
 
 .song-card:hover{
-  transform:translateY(-5px);
-  box-shadow:0 15px 30px rgba(0,0,0,.12);
+  transform:translateY(-8px) scale(1.01);
+  box-shadow:0 20px 40px rgba(0,0,0,.18);
 }
 
 
@@ -117,8 +118,9 @@ nav a:hover{
 }
 .song-header h3{
   margin:0;
-  font-size:30px;
-  font-weight:600;
+  font-size:28px;
+  font-weight:700;
+  letter-spacing:.3px;
 }
 
 .song-header a{
@@ -402,6 +404,21 @@ nav a:hover{
 .edit-btn:hover,
 .delete-btn:hover{
   transform:translateY(-2px);
+  .actions button{
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    opacity .25s ease;
+}
+
+.actions button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 18px rgba(0,0,0,.2);
+}
+
+.actions button:active{
+  transform:scale(.96);
+}
   transition:0.2s;
 }
 
@@ -470,7 +487,8 @@ nav a:hover{
 
 .search-box:focus,
 .filter-select:focus {
-  border-color: #1E3A5F;
+  border-color:#D4AF37;
+  box-shadow:0 0 15px rgba(212,175,55,.25);
 }
 
 .export-btn{
@@ -860,6 +878,23 @@ body.dark-theme {
 }
 
 .empty-favorites p{
+    font-size:20px;
+    color:var(--secondary-text);
+}
+/* Empty Search State */
+
+.empty-state{
+    text-align:center;
+    padding:80px 20px;
+}
+
+.empty-state h2{
+    font-size:36px;
+    color:var(--text-color);
+    margin-bottom:15px;
+}
+
+.empty-state p{
     font-size:20px;
     color:var(--secondary-text);
 }
